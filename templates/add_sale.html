@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Add Sale{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Record a New Sale</h1>
+</div>
+
+<form method="POST" action="">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+        {{ form.product_name.label(class="form-label") }}
+        <!-- Use a datalist for autocomplete -->
+        {{ form.product_name(class="form-control", list="inventory_items_list") }}
+        <datalist id="inventory_items_list">
+            {% for item in items %}
+                <option value="{{ item.name }}">
+            {% endfor %}
+        </datalist>
+    </div>
+    <div class="mb-3">
+        {{ form.quantity.label(class="form-label") }}
+        {{ form.quantity(class="form-control") }}
+    </div>
+    <div class="mb-3">
+        {{ form.total_price.label(class="form-label") }}
+        {{ form.total_price(class="form-control") }}
+    </div>
+    <div class="mb-3">
+        {{ form.submit(class="btn btn-primary") }}
+    </div>
+</form>
+{% endblock %}

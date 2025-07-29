@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+<!-- Import the macro at the top -->
+{% from "_macros.html" import pagination_widget %}
+
+{% block title %}Sales Records{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Sales Records</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{{ url_for('export_sales') }}" class="btn btn-sm btn-outline-success me-2">
+            Export to CSV
+        </a>
+        <a href="{{ url_for('add_sale') }}" class="btn btn-sm btn-outline-secondary">
+            Add New Sale
+        </a>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-sm">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Product Name</th>
+                <th>Quantity Sold</th>
+                <th>Total Price</th>
+                <th>Date of Sale</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- UPDATED: We now loop over sale_records.items from the pagination object -->
+            {% for sale in sale_records.items %}
+            <tr>
+                <td>{{ sale.id }}</td>
+                <td>{{ sale.product_name }}</td>
+                <td>{{ sale.quantity }}</td>
+                <td>${{ "%.2f"|format(sale.total_price) }}</td>
+                <td>{{ sale.date_sold.strftime('%Y-%m-%d %H:%M') }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" class="text-center">No sales recorded yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- START: RENDER THE PAGINATION WIDGET -->
+{% if sale_records.pages > 1 %}
+    {{ pagination_widget(sale_records, 'sales') }}
+{% endif %}
+<!-- END: RENDER THE PAGINATION WIDGET -->
+
+{% endblock %}

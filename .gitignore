@@ -1,0 +1,12 @@
+# .gitignore
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Instance Folder
+/instance
+
+# Environment Variables
+.env

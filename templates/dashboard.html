@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard</h1>
+</div>
+
+<!-- Top Stat Cards (Existing) -->
+<div class="row">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-header">Total Inventory Items</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ inventory_count }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-header">Total Sales Recorded</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ sales_count }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-header">Total Revenue</div>
+            <div class="card-body">
+                <h5 class="card-title">${{ "%.2f"|format(total_revenue) }}</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- START: NEW SALES TREND CHART -->
+<div class="row">
+    <div class="col">
+        <h3>Sales Revenue (Last 7 Days)</h3>
+        <canvas id="salesTrendChart"></canvas>
+    </div>
+</div>
+<!-- END: NEW SALES TREND CHART -->
+
+
+<!-- Include Chart.js from a CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Wait for the document to be fully loaded before running the script
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('salesTrendChart');
+        
+        new Chart(ctx, {
+            type: 'line', // Use a line chart for trend data
+            data: {
+                labels: {{ sales_chart_labels|tojson }}, // Dates from our backend
+                datasets: [{
+                    label: 'Sales Revenue ($)',
+                    data: {{ sales_chart_data|tojson }}, // Sales totals from our backend
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        // Add a dollar sign to the Y-axis ticks
+                        ticks: {
+                            callback: function(value, index, values) {
+                                return '$' + value;
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
